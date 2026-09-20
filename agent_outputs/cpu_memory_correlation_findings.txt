@@ -1,0 +1,24 @@
+CPU vs Memory Usage Correlation Findings (system_performance.csv)
+
+1) Overall correlation (all samples)
+- Pearson correlation (linear): r = 0.974 (p ≈ 3.23e-52)
+- Spearman correlation (rank/monotonic): ρ = 0.989 (p ≈ 5.61e-67)
+
+Interpretation:
+CPU usage and memory usage are very strongly positively correlated. As CPU increases, memory usage almost always increases as well, and the relationship is close to linear.
+
+2) “High CPU” vs “not high CPU” comparison
+Definition: High CPU = cpu_percent ≥ 80%
+
+- High CPU (n = 19): memory avg 78.53% (min 68%, max 88%)
+- CPU < 80% (n = 61): memory avg 52.25% (min 42%, max 68%)
+
+Difference:
+High CPU is associated with +26.28 percentage points higher average memory usage
+(Welch t-test p ≈ 1.45e-18).
+
+3) Simple linear relationship (best-fit line)
+Memory% ≈ 29.74 + 0.515 × CPU%
+
+Rule of thumb:
+Each +10% CPU corresponds to about +5.15% memory usage on average.
