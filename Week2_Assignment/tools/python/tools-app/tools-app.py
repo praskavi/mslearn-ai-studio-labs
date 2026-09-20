@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
+# import namespaces
 from openai import OpenAI
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
@@ -36,7 +37,7 @@ def main():
         if not brochure_files:
             print("No PDF files found in the brochures folder!")
             return
-
+# Create vector store and upload files
         print("Creating vector store and uploading files...")
         vector_store = openai_client.vector_stores.create(name="travel-brochures")
         with_file_streams = [open(file_path, "rb") for file_path in brochure_files]

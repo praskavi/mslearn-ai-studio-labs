@@ -55,11 +55,15 @@ def main():
             #     ]
             # )
             # print(f"\nAssistant: {completion.choices[0].message.content}", flush=True)
+            
             # Get and display a response for the current prompt using the response API
             # Track responses
             # last_response_id = None
             response = openai_client.responses.create(
                 model=model_deployment,
+                # simpler syntax in which the system message is assigned to the instructions parameter
+                instructions = "You are a helpful AI assistant that answers questions and provides information.",
+                # the user prompt is assigned to the input parameter.
                 input=input_text,
                 stream=True,
                 previous_response_id=last_response_id

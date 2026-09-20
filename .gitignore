@@ -2,6 +2,12 @@
 .env
 .env.*
 !.env.example
+local.settings.json
+.azure/
+*.pem
+*.key
+*.pfx
+*.publishsettings
 
 # Python virtual environments
 .venv/
@@ -18,6 +24,9 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+*.db
+*.sqlite
+*.sqlite3
 
 # Jupyter and notebook checkpoints
 .ipynb_checkpoints/
@@ -37,6 +46,12 @@ build/
 dist/
 *.egg-info/
 .eggs/
+
+# Local reference material and catalog generation files
+/Instructions/
+/text-files/
+/generate_lab_catalog.py
+/lab_catalog.csv
 
 # Logs and temporary files
 *.log
