@@ -1,0 +1,175 @@
+Trail Guide Prompt Monitoring Observations
+==========================================
+
+Context
+-------
+The monitoring script compares prompt versions against the same five test prompts:
+day-hike-gear, overnight-camping, three-day-backpacking, trail-difficulty, and
+winter-hiking. The model used was gpt-5.1.
+
+Verified observations from the completed run
+----------------------------------------------
+
+1. V1 used the fewest tokens for every test prompt in the current run. Its average
+   was 695.2 total tokens and 8.71 seconds.
+
+2. V2 used more tokens than V1 for every test prompt. Its average was 1,644.0 total
+   tokens and 18.42 seconds.
+
+3. V3 also used more tokens than V1 for every test prompt. Its average was 1,694.8
+   total tokens and 18.15 seconds.
+
+4. Longer completions generally required more time. The largest V2 and V3 responses
+   also had the longest observed durations, so completion length is an important
+   latency and cost signal for this comparison.
+
+5. V4 optimized concise was successfully measured after correcting its filename.
+   It averaged 1,519.8 total tokens and 17.90 seconds. It used fewer tokens than
+   V2 and V3 overall, but was slower than both on average in this run.
+
+V4 per-prompt evaluation
+------------------------
+
+Prompt                  V4 total  V4 time   Comparison and observation
+day-hike-gear              887     9.26s    Lower tokens than V2 (903) and V3 (1,313).
+                                            The response applied layered gear and safety guidance.
+overnight-camping        2,119    24.06s    Highest V4 cost and latency. The response stated
+                                            assumptions and gave detailed first-trip guidance,
+                                            but this is not concise in execution.
+three-day-backpacking    1,547    16.37s    Lower tokens than V2 (2,058) and V3 (2,017).
+                                            The response focused on key safety considerations.
+trail-difficulty         1,560    17.91s    Slightly above V2 (1,540) and V3 (1,522).
+                                            The response used a practical beginner checklist.
+winter-hiking             1,486    21.92s    Lower tokens than V2 (1,893) and V3 (1,675).
+                                            The response covered warmth, dryness, visibility,
+                                            and safety.
+
+V4 quality assessment
+---------------------
+Based on the captured response summaries, V4 consistently produced specific,
+actionable, safety-oriented answers and addressed the main requirements of its
+instruction. Its strongest visible behaviors were explicit assumptions for an
+overnight trip, structured safety guidance for backpacking, a usable fitness
+checklist, and clear winter-hiking risk categories.
+
+V4 appears more efficient than V2 and V3 on three of five prompts by total tokens,
+and it is substantially more efficient on three-day-backpacking and winter-hiking.
+It is less efficient on overnight-camping and trail-difficulty. The overnight case
+is the main outlier and should be investigated before calling V4 consistently
+concise.
+
+No objective quality scores are available. evaluation_results.txt reports 89 scored
+items but no returned scores or pass rates, so these quality observations are
+qualitative and should not be treated as a proven ranking.
+
+Runtime span-tree comparison: V3 versus V4
+------------------------------------------
+The runtime traces use the parent spans `trail_guide_v3` and
+`trail_guide_v4_optimized_concise`, with one child span per test prompt. The
+following comparison uses the five corresponding child-span measurements from
+the same monitoring run.
+
+Token reduction at runtime
+--------------------------
+The token reduction does hold up at runtime on average. V4 used 1,519.8 total
+tokens per test compared with 1,694.8 for V3, a reduction of 175.0 tokens or
+approximately 10.3%.
+
+The reduction was not uniform:
+
+   day-hike-gear:           1,313 ->   887 (-32.4%)
+   overnight-camping:       1,947 -> 2,119 (+8.8%)
+   three-day-backpacking:   2,017 -> 1,547 (-23.3%)
+   trail-difficulty:        1,522 -> 1,560 (+2.5%)
+   winter-hiking:           1,675 -> 1,486 (-11.3%)
+
+V4 therefore reduces runtime token usage overall, but the overnight-camping
+response is an important regression and should be investigated.
+
+Latency improvement at runtime
+------------------------------
+There is no meaningful latency improvement. V4 averaged 17.90 seconds compared
+with 18.15 seconds for V3, only 0.25 seconds or approximately 1.4% faster.
+The per-prompt result is mixed: V4 was faster for day-hike-gear and
+three-day-backpacking, but slower for overnight-camping, trail-difficulty, and
+winter-hiking.
+
+The small average difference is within the normal variation expected from remote
+model calls, so the runtime data supports a token-efficiency improvement, not a
+reliable latency improvement.
+
+Response quality in the span tree
+----------------------------------
+The span attributes record duration, token counts, prompt version, and test name,
+but they do not contain objective quality scores. From the captured response
+summaries, V4 appears comparable to V3 for the tested behaviors: both provide
+structured, actionable, safety-focused trail guidance. V4 visibly emphasizes
+assumptions and concise safety categories, while V3 provides broader capability
+framing in its instruction.
+
+This is not enough to establish parity. The overnight-camping outlier shows that
+V4 can produce a longer answer, and the current traces cannot measure relevance,
+completeness, personalization, or safety quality directly. Add rubric-based
+grader results to the child spans or join them by `test.name` and
+`prompt.version` before making a production quality decision.
+
+Runtime conclusion
+------------------
+V4's measured token reduction against V3 holds at runtime by about 10.3% overall.
+It does not produce a dependable latency improvement, and the available span data
+only supports qualitative, not scored, response-quality comparability. V4 remains
+a promising efficiency candidate, subject to quality grading and investigation of
+the overnight-camping regression.
+
+Balance of quality and efficiency
+----------------------------------
+V2 is the best likely balance among the measured versions. It adds explicit
+personalization inputs, actionable safety guidance, and relevant gear suggestions
+without V3's much broader capability claims. V1 is the most token-efficient, but
+its instructions provide less guidance for consistently detailed responses.
+
+Average measured values for the current four-version run:
+
+   V1: 695.2 total tokens, 8.71 seconds
+   V2: 1,644.0 total tokens, 18.42 seconds
+   V3: 1,694.8 total tokens, 18.15 seconds
+   V4: 1,519.8 total tokens, 17.90 seconds
+
+The quality conclusion is provisional. evaluation_results.txt reports 89 scored
+items but contains no returned quality scores or pass rates, so the data does not
+prove that V2 produces better answers than V1 or V3. A rubric-based evaluation is
+needed to confirm that conclusion.
+
+Does added complexity justify its cost?
+----------------------------------------
+Not based on the current evidence. Moving from V1 to V2 more than doubles average
+total tokens and nearly doubles average duration. That may be justified if the
+additional personalization and safety structure produce materially better rubric
+scores, but those scores are currently unavailable.
+
+Moving from V2 to V3 increases average tokens by about 3.1% in the current run,
+while its extra capabilities are not demonstrated by these direct prompt tests.
+The added cost is therefore hard to justify unless a quality evaluation shows a
+meaningful improvement in safety, relevance, or completeness.
+
+Recommendation
+--------------
+Use V4 as the current candidate for further quality validation: it reduces token
+use versus V2 and V3 overall while preserving the desired safety and structure.
+Keep V1 as the low-cost baseline, and investigate V4's overnight-camping outlier.
+Run explicit quality graders for relevance, safety, personalization, and
+completeness before making a final production decision.
+
+Measurement record format
+-------------------------
+The monitoring script now writes monitoring_results.txt in the repository root.
+Each row contains:
+
+Prompt version | Test prompt | Duration (seconds) | Prompt tokens |
+Completion tokens | Total tokens
+
+Next comparison step
+--------------------
+Use the complete 20-row monitoring_results.txt file with explicit quality graders.
+Compare V4 against V1-V3 for relevance, safety, personalization, completeness, and
+conciseness, with particular attention to the overnight-camping outlier.
