@@ -1,0 +1,21 @@
+Prompt version	Test prompt	Duration (seconds)	Prompt tokens	Completion tokens	Total tokens
+v1	day-hike-gear	9.605	66	506	572
+v1	overnight-camping	7.190	62	589	651
+v1	three-day-backpacking	12.095	74	896	970
+v1	trail-difficulty	7.082	71	556	627
+v1	winter-hiking	7.585	66	590	656
+v2	day-hike-gear	10.555	108	795	903
+v2	overnight-camping	18.874	104	1722	1826
+v2	three-day-backpacking	24.818	116	1942	2058
+v2	trail-difficulty	16.625	113	1427	1540
+v2	winter-hiking	21.235	108	1785	1893
+v3	day-hike-gear	13.137	164	1149	1313
+v3	overnight-camping	20.358	160	1787	1947
+v3	three-day-backpacking	21.585	172	1845	2017
+v3	trail-difficulty	17.405	169	1353	1522
+v3	winter-hiking	18.281	164	1511	1675
+v4_optimized_concise	day-hike-gear	9.259	86	801	887
+v4_optimized_concise	overnight-camping	24.057	82	2037	2119
+v4_optimized_concise	three-day-backpacking	16.374	94	1453	1547
+v4_optimized_concise	trail-difficulty	17.910	91	1469	1560
+v4_optimized_concise	winter-hiking	21.915	86	1400	1486
