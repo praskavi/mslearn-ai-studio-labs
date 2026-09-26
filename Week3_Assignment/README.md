@@ -1,6 +1,11 @@
 # Week 3 Assignment: GenAIOps
 
-This folder is a Microsoft Foundry GenAIOps lab built around a **Trail Guide Agent**. It practices deploying Azure infrastructure, managing prompt versions, testing an agent, evaluating response quality, and monitoring model usage and latency.
+This folder contains two Microsoft Foundry exercises:
+
+1. **IT Support Agent**: interact with an existing agent that answers policy questions, analyzes system-performance files, and can return generated files or images.
+2. **Adventure Works Trail Guide Agent**: deploy and test an outdoor-adventure agent with multiple prompt and instruction versions, then evaluate and monitor the results.
+
+The second exercise is the larger GenAIOps workflow. It practices deploying Azure infrastructure, managing prompt versions, testing an agent, evaluating response quality, and monitoring model usage and latency.
 
 ## What is practiced
 
@@ -15,7 +20,41 @@ This folder is a Microsoft Foundry GenAIOps lab built around a **Trail Guide Age
 - Comparing prompt versions using token counts, latency, and response quality.
 - GitHub Actions integration for evaluation and collaboration workflows.
 
-## Project structure
+## Exercise 1: IT Support Agent
+
+The IT Support Agent exercise is implemented by `agent_with_functions.py`. It connects to an existing Foundry agent, maintains a conversation, and handles structured Responses API output.
+
+### Inputs
+
+- `PROJECT_ENDPOINT` identifies the Microsoft Foundry project.
+- `AGENT_NAME` selects the deployed agent and defaults to `it-support-agent`.
+- User questions are entered at the console.
+- `IT_Policy.txt` contains Contoso IT policy information.
+- `system_performance.csv` and `system_performance.txt` contain CPU, memory, disk, and network measurements.
+
+The Python client does not open the policy or system-performance files directly. They must be available to the configured agent through its knowledge, code interpreter, file, or another connected tool.
+
+### Outputs and flow
+
+1. Load the project endpoint and agent name from `.env`.
+2. Authenticate with `DefaultAzureCredential` and connect with `AIProjectClient`.
+3. Create a conversation and repeatedly add user messages.
+4. Invoke the existing agent through the Responses API.
+5. Print text responses, download cited container files, and decode generated images.
+6. Save generated artifacts under `agent_outputs/`, adding a numeric suffix instead of overwriting existing files.
+7. End on `exit`, `quit`, or `bye`.
+
+Run it with:
+
+```powershell
+python agent_with_functions.py
+```
+
+## Exercise 2: Adventure Works Trail Guide Agent
+
+This exercise is the GenAIOps project built around the **Adventure Works Trail Guide Agent**. It covers infrastructure, prompt engineering, repeatable testing, cloud evaluation, and production-style monitoring.
+
+## Concepts practiced
 
 ```text
 Week3_Assignment/
@@ -41,7 +80,7 @@ Week3_Assignment/
 
 The `docs/` folder contains the detailed lab exercises for infrastructure setup, prompt management, prompt optimization, automated evaluation, and monitoring/tracing.
 
-## Inputs
+## Trail Guide Inputs
 
 ### Environment configuration
 
@@ -62,11 +101,7 @@ The exact model must be available in the selected Azure region. `DefaultAzureCre
 - `src/tests/test-prompts/` contains five repeatable scenarios: day hiking, overnight camping, three-day backpacking, trail difficulty, and winter hiking.
 - `data/trail_guide_evaluation_dataset.jsonl` contains 89 query, response, and ground-truth records for cloud evaluation.
 
-### Supporting scenario files
-
-`IT_Policy.txt`, `system_performance.csv`, and `system_performance.txt` belong to the earlier IT-support scenario and can be used as agent knowledge or analysis inputs. The current Trail Guide scripts do not automatically open those files.
-
-## Dependencies
+## Trail Guide Dependencies
 
 Install the pinned and minimum versions defined in `requirements.txt`:
 
@@ -85,7 +120,7 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-## Infrastructure and deployment flow
+## Trail Guide Infrastructure and Deployment Flow
 
 1. Authenticate with Azure:
 
@@ -104,7 +139,7 @@ python -m pip install -r requirements.txt
 3. The Bicep templates in `infra/` create the Foundry account and project, model deployment, role assignments, Application Insights, and Log Analytics resources. Monitoring is enabled by default.
 4. Set `AGENT_NAME` and `MODEL_NAME` in `.env` as needed.
 
-## Agent creation flow
+## Trail Guide Agent Creation Flow
 
 `src/agents/trail_guide_agent/trail_guide_agent.py`:
 
@@ -122,7 +157,7 @@ python src/agents/trail_guide_agent/trail_guide_agent.py
 
 The checked-in `agent.yaml` identifies the `trail-guide-v1` agent and currently points to `prompts/v2_instructions.txt`; review that configuration before creating a new version.
 
-## Testing flow
+## Trail Guide Testing Flow
 
 ### Interactive testing
 
@@ -144,7 +179,7 @@ python src/tests/run_batch_tests.py baseline
 
 The output includes the prompt text, response, agent metadata, token usage, and response ID. Use a different experiment name for each prompt or model variation.
 
-## Evaluation flow
+## Trail Guide Evaluation Flow
 
 Run the cloud evaluation pipeline:
 
@@ -156,7 +191,7 @@ The script uploads or reuses the JSONL dataset, defines the evaluators, starts a
 
 The current result file records 89 successful items, but the service response did not return individual scores or pass rates. Treat the result as a completed run, not as evidence of a quality ranking, until the detailed scores are reviewed in the Azure AI Foundry portal.
 
-## Monitoring and tracing flow
+## Trail Guide Monitoring and Tracing Flow
 
 Run the four prompt versions against the same five test prompts:
 
@@ -179,10 +214,6 @@ python src/tests/check_traces.py
 ```
 
 The current monitoring data shows that `v4_optimized_concise` used fewer average tokens than `v2` and `v3`, but it did not produce a dependable latency improvement. `monitoring_observations.txt` contains the detailed interpretation and identifies the overnight-camping response as an outlier requiring further quality validation.
-
-## Earlier IT-support example
-
-`agent_with_functions.py` is retained from the earlier exercise. It connects to an existing Foundry agent, maintains a conversation, prints structured response content, downloads cited container files, and saves base64-encoded images under `agent_outputs/`. Its supporting files are `IT_Policy.txt` and the system-performance datasets. It is separate from the Trail Guide GenAIOps workflow described above.
 
 ## Useful references
 
