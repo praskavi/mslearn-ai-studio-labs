@@ -1,0 +1,3 @@
+[submodule "Week6_Assignment/mslearn-ai-vision"]
+	path = Week6_Assignment/mslearn-ai-vision
+	url = https://github.com/microsoftlearning/mslearn-ai-vision
